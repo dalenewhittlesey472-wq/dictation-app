@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>明哥听写王中网 · 极简版</title>
+    <title>明哥听写王中网 · 极简无限刷题版</title>
     <script src="https://unpkg.com/tesseract.js@v5.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -78,10 +78,11 @@
         .sentence-item:focus-within { border-color: var(--text-muted); box-shadow: 0 0 0 4px var(--bg-color); }
         .feedback { margin-top: 16px; padding: 16px; border-radius: 8px; font-size: 0.95rem; animation: fadeIn 0.3s ease; line-height: 1.6; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* 正确：实线黑框 + 浅灰底 */
         .correct { background: var(--bg-color); border-left: 4px solid var(--primary); color: var(--text-main); }
-        /* 错误：虚线灰框 */
         .partial { background: transparent; border: 1px dashed var(--text-muted); color: var(--text-muted); }
+
+        /* 翻译展示区 */
+        .translation-box { margin-top: 12px; padding: 12px; background: var(--bg-color); border-radius: 6px; font-size: 0.9rem; color: var(--text-main); border-left: 3px solid var(--text-muted); animation: fadeIn 0.3s ease;}
 
         /* 数据徽章与标签 */
         .stat-badge { background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-left: 8px; }
@@ -109,7 +110,7 @@
         </div>
 
         <div class="full-width">
-            <h1 data-zh="明哥听写王中网" data-en="MingGe Dictation King Web">明哥听写王中网</h1>
+            <h1 data-zh="明哥听写王中网" data-en="MingGe Dictation Web">明哥听写王中网</h1>
             <div class="subtitle" data-zh="保持专注 · 每日精听" data-en="Stay Focused · Daily Dictation">保持专注 · 每日精听</div>
         </div>
 
@@ -118,36 +119,36 @@
             <div class="guide-grid">
                 <div class="guide-item">
                     <h3 data-zh="📥 模块一：素材库" data-en="📥 1. Material">📥 模块一：素材库</h3>
-                    <p data-zh="支持手动粘贴文本或上传图片识别文字。你也可以直接在听写区点击“随机获取金句”实现一键填充。" data-en="Paste text or use OCR. Or just click 'Auto-Fetch' in the practice zone for instant quotes.">支持手动粘贴文本或上传图片识别文字。你也可以直接在听写区点击“随机获取金句”实现一键填充。</p>
+                    <p data-zh="点击听写区的【随机获取】将不断追加四六级难度的新段落。也支持在左侧手动粘贴文本追加。" data-en="Click 'Auto-Fetch' to constantly append CET-level paragraphs, or manually paste custom text.">点击听写区的【随机获取】将不断追加四六级难度的新段落。也支持在左侧手动粘贴文本追加。</p>
                 </div>
                 <div class="guide-item">
                     <h3 data-zh="🔍 模块二：生词本" data-en="🔍 2. Dictionary">🔍 模块二：生词本</h3>
-                    <p data-zh="听写中遇到生词随时查询。查询记录会转化为标签，点击历史标签即可快速重新查阅复习。" data-en="Look up words anytime. History words become clickable tags for quick review.">听写中遇到生词随时查询。查询记录会转化为标签，点击历史标签即可快速重新查阅复习。</p>
+                    <p data-zh="听写中遇到生词随时查。查询记录转化为标签，点击历史标签即可快速重新查阅复习。" data-en="Look up words anytime. History words become clickable tags for quick review.">听写中遇到生词随时查。查询记录转化为标签，点击历史标签即可快速重新查阅复习。</p>
                 </div>
                 <div class="guide-item">
                     <h3 data-zh="✍️ 模块三：听写区" data-en="✍️ 3. Practice">✍️ 模块三：听写区</h3>
-                    <p data-zh="文本会自动按10~15词智能分段。播放录音并输入，输入完成后直接按下 Enter 键即可光速校验。" data-en="Text is smartly chunked. Type what you hear and press Enter to quickly verify answers.">文本会自动按10~15词智能分段。播放录音并输入，输入完成后直接按下 Enter 键即可光速校验。</p>
+                    <p data-zh="长文自动切分为10-15词。播放并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。" data-en="Listen and type. Press Enter to verify. Click the Translate button for Chinese meaning.">长文自动切分为10-15词。播放并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。</p>
                 </div>
                 <div class="guide-item">
                     <h3 data-zh="🏆 模块四：学习战报" data-en="🏆 4. Report">🏆 模块四：学习战报</h3>
-                    <p data-zh="完成练习后，系统将为你生成极简排版的专属学习海报，记录专注时长，附送每日金句。" data-en="Generate a minimalist learning poster recording your focus time and a daily quote.">完成练习后，系统将为你生成极简排版的专属学习海报，记录专注时长，附送每日金句。</p>
+                    <p data-zh="结束刷题后，生成极简黑白灰排版专属海报，记录专注时长与刷题量，附送双语金句。" data-en="Generate a minimalist learning poster recording your focus time and a daily quote.">结束刷题后，生成极简黑白灰排版专属海报，记录专注时长与刷题量，附送双语金句。</p>
                 </div>
             </div>
         </div>
 
         <div class="card">
-            <h2 data-zh="素材源" data-en="Source">素材源</h2>
+            <h2 data-zh="手动追加素材" data-en="Custom Material">手动追加素材</h2>
             <div style="margin-bottom: 15px;">
                 <input type="file" id="imageInput" accept="image/*" class="hidden">
                 <button class="btn btn-outline" style="width: 100%;" id="btnOcr" onclick="document.getElementById('imageInput').click()" data-zh="从图片识别文字 (OCR)" data-en="Extract Text (OCR)">从图片识别文字 (OCR)</button>
             </div>
-            <textarea id="sourceText" rows="6" placeholder="在此粘贴英文素材..."></textarea>
+            <textarea id="sourceText" rows="6" placeholder="在此粘贴英文素材，点击下方按钮追加到听写区..."></textarea>
             
             <div style="margin: 20px 0;">
                 <label style="font-size: 0.9rem; font-weight: 600;"><span data-zh="语速" data-en="Speed">语速</span>: <span id="speedLabel">1.0</span>x</label>
                 <input type="range" id="speedRange" min="0.4" max="1.8" step="0.1" value="1.0" style="width:100%; margin-top: 10px;" oninput="document.getElementById('speedLabel').innerText=this.value">
             </div>
-            <button class="btn btn-outline" style="width:100%;" onclick="generateExercises()" id="btnSplit" data-zh="分解当前素材" data-en="Split Custom Text">分解当前素材</button>
+            <button class="btn btn-outline" style="width:100%;" onclick="appendCustomText()" id="btnSplit" data-zh="追加当前素材到听写区" data-en="Append to Practice Zone">追加当前素材到听写区</button>
         </div>
 
         <div class="card">
@@ -165,20 +166,23 @@
 
         <div class="card full-width">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
-                <h2 style="margin:0; border:none;" data-zh="听写区" data-en="Practice Zone">听写区</h2>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <h2 style="margin:0; border:none;" data-zh="听写刷题区" data-en="Practice Zone">听写刷题区</h2>
+                    <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="clearPracticeZone()" data-zh="清空面板" data-en="Clear All">清空面板</button>
+                </div>
                 <div id="liveStats" style="display: flex; align-items: center;">
                     <span class="stat-badge"><span data-zh="完成度" data-en="Progress">完成度</span>: <span id="countSent">0</span>/<span id="totalSent">0</span></span>
                     <span class="stat-badge"><span data-zh="计时" data-en="Time">计时</span>: <span id="studyTime">00:00</span></span>
                 </div>
             </div>
             
-            <button class="btn" id="btnFetchAndStart" onclick="fetchAndStartPractice()" style="width: 100%; padding: 16px; margin-bottom: 24px; font-size: 1.05rem;" data-zh="随机获取金句并开始练习" data-en="Fetch Random Quote & Start">随机获取金句并开始练习</button>
+            <button class="btn" id="btnFetchAndStart" onclick="fetchAndAppendPractice()" style="width: 100%; padding: 16px; margin-bottom: 24px; font-size: 1.05rem;" data-zh="随机获取段落并追加题目" data-en="Fetch Paragraph & Append">随机获取段落并追加题目</button>
 
             <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 
             <div id="practiceArea">
-                <div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border-color); border-radius: 8px;">
-                    <p id="practiceEmptyMsg" data-zh="等待开始..." data-en="Waiting to start...">等待开始...</p>
+                <div id="practiceEmptyMsg" style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border-color); border-radius: 8px;">
+                    <p data-zh="点击上方按钮，或在左侧导入素材开始..." data-en="Click button above or import text to start...">点击上方按钮，或在左侧导入素材开始...</p>
                 </div>
             </div>
         </div>
@@ -198,7 +202,8 @@
     <script>
         let currentLang = 'zh';
         let currentTheme = 'light';
-        let chunks = [];
+        let chunks = [];          // 题库数组
+        let originalTexts = [];   // 用于战报显示的原文拼接
         let vocabCount = 0;
         let sentencesDone = new Set();
         let startTime = new Date();
@@ -206,11 +211,21 @@
         const speech = window.speechSynthesis;
         const learnedWords = [];
 
+        // 高质量长篇语料库 (四六级/考研难度级别)
+        const offlineLibrary = [
+            "The shift towards a digital economy has fundamentally changed how we work and live. Remote work is no longer merely a perk but a standard requirement for many professionals. Companies must adapt to this new paradigm to remain competitive.",
+            "Environmental protection is one of the most pressing issues of our time. Reducing carbon footprints, minimizing plastic waste, and transitioning to renewable energy sources are critical steps to ensure a sustainable future for the next generation.",
+            "Artificial intelligence is rapidly transforming various industries, from healthcare and education to finance. While it offers unprecedented efficiency and convenience, it also raises significant ethical concerns regarding privacy and employment.",
+            "Reading literature allows us to step into the shoes of others and view the world from entirely different perspectives. It cultivates empathy, sharpens critical thinking, and enriches our understanding of complex human emotions.",
+            "The concept of lifelong learning has become essential in today's fast-paced society. As technology evolves at a breakneck speed, updating our skills constantly is the only way to avoid becoming obsolete in the job market."
+        ];
+
         // 励志金句
         const quotes = [
             { zh: "流水不争先，争的是滔滔不绝。", en: "Consistency is what transforms average into excellence." },
             { zh: "合抱之木，生于毫末；九层之台，起于累土。", en: "A journey of a thousand miles begins with a single step." },
-            { zh: "你必须非常努力，才能看起来毫不费力。", en: "You have to work very hard to look effortless." }
+            { zh: "你必须非常努力，才能看起来毫不费力。", en: "You have to work very hard to look effortless." },
+            { zh: "不要等待机会，而要创造机会。", en: "Don't wait for opportunities, create them." }
         ];
 
         // --- 主题与语言切换 ---
@@ -225,7 +240,7 @@
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('langBtn').innerText = currentLang === 'zh' ? "EN" : "中";
             document.querySelectorAll('[data-zh]').forEach(el => el.innerHTML = el.getAttribute(`data-${currentLang}`));
-            document.getElementById('sourceText').placeholder = currentLang === 'zh' ? "在此粘贴英文素材..." : "Paste your text here...";
+            document.getElementById('sourceText').placeholder = currentLang === 'zh' ? "在此粘贴英文素材，点击下方按钮追加..." : "Paste your text here and append...";
             document.getElementById('wordInput').placeholder = currentLang === 'zh' ? "输入单词..." : "Enter word...";
             document.querySelectorAll('.practice-input').forEach(input => input.placeholder = currentLang === 'zh' ? "听写 (回车校验)..." : "Type (Press Enter)...");
             document.getElementById('dictResult').innerText = "...";
@@ -234,11 +249,13 @@
 
         // --- 计时器与进度 ---
         function startTimer() {
-            clearInterval(timerInterval); startTime = new Date();
-            timerInterval = setInterval(() => {
-                const diff = Math.floor((new Date() - startTime) / 1000);
-                document.getElementById('studyTime').innerText = `${Math.floor(diff / 60).toString().padStart(2, '0')}:${(diff % 60).toString().padStart(2, '0')}`;
-            }, 1000);
+            if(!timerInterval) {
+                startTime = new Date();
+                timerInterval = setInterval(() => {
+                    const diff = Math.floor((new Date() - startTime) / 1000);
+                    document.getElementById('studyTime').innerText = `${Math.floor(diff / 60).toString().padStart(2, '0')}:${(diff % 60).toString().padStart(2, '0')}`;
+                }, 1000);
+            }
         }
 
         function updateProgress() {
@@ -248,22 +265,144 @@
             document.getElementById('progressBar').style.width = `${pct}%`;
         }
 
-        // --- 获取并开始练习 ---
-        async function fetchAndStartPractice() {
+        function clearPracticeZone() {
+            if(confirm(currentLang === 'zh' ? "确定要清空听写区的所有题目吗？" : "Clear all practice sentences?")) {
+                chunks = [];
+                originalTexts = [];
+                sentencesDone.clear();
+                document.getElementById('practiceArea').innerHTML = `<div id="practiceEmptyMsg" style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border-color); border-radius: 8px;"><p>${currentLang === 'zh' ? '已清空，请重新获取素材。' : 'Cleared. Please fetch new material.'}</p></div>`;
+                updateProgress();
+            }
+        }
+
+        // --- 获取并追加练习 ---
+        async function fetchAndAppendPractice() {
             const btn = document.getElementById('btnFetchAndStart'); 
             const originalText = btn.innerHTML;
             btn.innerText = currentLang === 'zh' ? "获取中..." : "Fetching...";
             btn.style.pointerEvents = "none";
 
+            let newText = "";
             try { 
+                // 尝试获取大段落文本
                 const res = await axios.get('https://dummyjson.com/posts/random');
-                document.getElementById('sourceText').value = res.data.body; 
+                newText = res.data.body; 
             } catch (e) { 
-                document.getElementById('sourceText').value = quotes[Math.floor(Math.random() * quotes.length)].en; 
+                // 如果API失败，使用本地四六级图库
+                newText = offlineLibrary[Math.floor(Math.random() * offlineLibrary.length)]; 
             } finally { 
                 btn.innerHTML = originalText;
                 btn.style.pointerEvents = "auto";
-                generateExercises();
+                processAndAppendText(newText);
+            }
+        }
+
+        // 手动处理文本域追加
+        function appendCustomText() {
+            const text = document.getElementById('sourceText').value.trim();
+            if(text) {
+                processAndAppendText(text);
+                document.getElementById('sourceText').value = ""; // 提取后清空输入框
+            }
+        }
+
+        // --- 核心追加逻辑 ---
+        function processAndAppendText(rawText) {
+            startTimer();
+            originalTexts.push(rawText);
+            
+            const rawSentences = rawText.match(/[^.!?;:\n]+[.!? ;:\n]*/g) || [rawText];
+            let newChunks = [];
+            
+            rawSentences.forEach(sentence => {
+                let words = sentence.trim().split(/\s+/).filter(w => w.length > 0);
+                if(words.length === 0) return;
+                
+                if (words.length <= 16) {
+                    newChunks.push(words.join(' '));
+                } else {
+                    let curr = [];
+                    for(let i=0; i<words.length; i++) {
+                        curr.push(words[i]);
+                        if ((curr.length >= 8 && (words[i].endsWith(',') || words[i].endsWith('--'))) || curr.length >= 15) {
+                            newChunks.push(curr.join(' ')); curr = [];
+                        }
+                    }
+                    if (curr.length > 0) newChunks.push(curr.join(' '));
+                }
+            });
+
+            // 清理碎片
+            for(let i=newChunks.length-1; i>0; i--) {
+                if (newChunks[i].split(' ').length < 6 && (newChunks[i-1].split(' ').length + newChunks[i].split(' ').length) <= 20) {
+                    newChunks[i-1] += ' ' + newChunks[i]; newChunks.splice(i, 1);
+                }
+            }
+
+            if(newChunks.length === 0) return;
+
+            // 隐藏空状态提示
+            const emptyMsg = document.getElementById('practiceEmptyMsg');
+            if(emptyMsg) emptyMsg.style.display = 'none';
+
+            const area = document.getElementById('practiceArea');
+            const startIndex = chunks.length;
+            chunks = chunks.concat(newChunks); // 追加到全局题库
+
+            const labels = {
+                chunk: currentLang === 'zh' ? '句子' : 'Sentence', words: currentLang === 'zh' ? '词' : 'words',
+                play: 'Play', stop: 'Stop', trans: currentLang === 'zh' ? '文' : 'EN/ZH',
+                verify: currentLang === 'zh' ? '校验' : 'Verify',
+                ph: currentLang === 'zh' ? '听写 (回车校验)...' : 'Type (Press Enter)...'
+            };
+
+            // 仅渲染新增的题目
+            newChunks.forEach((chunk, i) => {
+                const globalIndex = startIndex + i;
+                const item = document.createElement('div'); 
+                item.className = 'sentence-item';
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <span style="font-weight:700; font-size:1.05rem;">${labels.chunk} ${globalIndex + 1} <span style="font-size: 0.8rem; color:var(--text-muted); font-weight:normal;">(${chunk.split(' ').length} ${labels.words})</span></span>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem;" onclick="playSound(${globalIndex})">${labels.play}</button>
+                            <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem; border-color:var(--border-color); color:var(--text-muted);" onclick="speech.cancel()">${labels.stop}</button>
+                            <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem; background: var(--bg-color);" onclick="translateSentence(${globalIndex})" id="btn_trans_${globalIndex}">${labels.trans}</button>
+                        </div>
+                    </div>
+                    <div id="trans_box_${globalIndex}" class="translation-box hidden"></div>
+
+                    <input type="text" id="input_${globalIndex}" class="practice-input" placeholder="${labels.ph}" onkeypress="if(event.key === 'Enter') verify(${globalIndex})">
+                    <button class="btn btn-outline" style="width:100%; margin-top:8px; border-style:dashed;" onclick="verify(${globalIndex})">${labels.verify}</button>
+                    <div id="feedback_${globalIndex}" class="feedback hidden"></div>
+                `;
+                area.appendChild(item);
+            });
+            
+            updateProgress();
+            
+            // 自动播放追加进来的第一句
+            setTimeout(() => playSound(startIndex), 500);
+        }
+
+        // --- 句子翻译功能 ---
+        async function translateSentence(index) {
+            const transBox = document.getElementById(`trans_box_${index}`);
+            const textToTranslate = chunks[index];
+
+            if (!transBox.classList.contains('hidden') && transBox.innerText !== "..." && transBox.innerText !== "Translating...") {
+                transBox.classList.add('hidden'); // 再次点击折叠
+                return;
+            }
+
+            transBox.classList.remove('hidden');
+            transBox.innerText = currentLang === 'zh' ? "翻译中..." : "Translating...";
+
+            try {
+                const res = await axios.get(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textToTranslate)}&langpair=en|zh-CN`);
+                transBox.innerText = res.data.responseData.translatedText;
+            } catch (e) {
+                transBox.innerText = currentLang === 'zh' ? "翻译失败，请检查网络。" : "Translation failed.";
             }
         }
 
@@ -300,62 +439,7 @@
             });
         }
 
-        // --- 智能分段与校验 ---
-        function generateExercises() {
-            startTimer(); sentencesDone.clear();
-            const rawText = document.getElementById('sourceText').value;
-            const rawSentences = rawText.match(/[^.!?;:\n]+[.!? ;:\n]*/g) || [rawText];
-            chunks = [];
-            rawSentences.forEach(sentence => {
-                let words = sentence.trim().split(/\s+/).filter(w => w.length > 0);
-                if(words.length === 0) return;
-                if (words.length <= 16) chunks.push(words.join(' '));
-                else {
-                    let curr = [];
-                    for(let i=0; i<words.length; i++) {
-                        curr.push(words[i]);
-                        if ((curr.length >= 8 && (words[i].endsWith(',') || words[i].endsWith('--'))) || curr.length >= 15) {
-                            chunks.push(curr.join(' ')); curr = [];
-                        }
-                    }
-                    if (curr.length > 0) chunks.push(curr.join(' '));
-                }
-            });
-            for(let i=chunks.length-1; i>0; i--) {
-                if (chunks[i].split(' ').length < 6 && (chunks[i-1].split(' ').length + chunks[i].split(' ').length) <= 20) {
-                    chunks[i-1] += ' ' + chunks[i]; chunks.splice(i, 1);
-                }
-            }
-
-            updateProgress();
-            const area = document.getElementById('practiceArea'); area.innerHTML = "";
-            if (chunks.length === 0) return;
-
-            const labels = {
-                chunk: currentLang === 'zh' ? '片段' : 'Chunk', words: currentLang === 'zh' ? '词' : 'words',
-                play: 'Play', stop: 'Stop', verify: currentLang === 'zh' ? '校验' : 'Verify',
-                ph: currentLang === 'zh' ? '听写 (回车校验)...' : 'Type (Press Enter)...'
-            };
-
-            chunks.forEach((chunk, i) => {
-                const item = document.createElement('div'); item.className = 'sentence-item';
-                item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <span style="font-weight:700; font-size:1.05rem;">${labels.chunk} ${i + 1} <span style="font-size: 0.8rem; color:var(--text-muted); font-weight:normal;">(${chunk.split(' ').length} ${labels.words})</span></span>
-                        <div style="display:flex; gap:8px;">
-                            <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem;" onclick="playSound(${i})">${labels.play}</button>
-                            <button class="btn btn-outline" style="padding:4px 12px; font-size:0.8rem; border-color:var(--border-color); color:var(--text-muted);" onclick="speech.cancel()">${labels.stop}</button>
-                        </div>
-                    </div>
-                    <input type="text" id="input_${i}" class="practice-input" placeholder="${labels.ph}" onkeypress="if(event.key === 'Enter') verify(${i})">
-                    <button class="btn btn-outline" style="width:100%; margin-top:8px; border-style:dashed;" onclick="verify(${i})">${labels.verify}</button>
-                    <div id="feedback_${i}" class="feedback hidden"></div>
-                `;
-                area.appendChild(item);
-            });
-            if(chunks.length > 0) setTimeout(() => playSound(0), 500);
-        }
-
+        // --- 播放与校验 ---
         function playSound(index) {
             speech.cancel();
             const utter = new SpeechSynthesisUtterance(chunks[index]);
@@ -418,9 +502,11 @@
 
             ctx.beginPath(); ctx.moveTo(60, 300); ctx.lineTo(740, 300); ctx.stroke();
 
-            // 文本预览
+            // 文本预览 (拼接前120字符)
+            const combinedText = originalTexts.join(' ');
+            const previewText = combinedText ? combinedText.substring(0, 120) : "No practice data yet.";
             ctx.fillStyle = fgColor; ctx.font = "400 16px 'Inter', sans-serif";
-            wrapText(ctx, `"${document.getElementById('sourceText').value.substring(0, 120)}..."`, 60, 350, 680, 26);
+            wrapText(ctx, `"${previewText}..."`, 60, 350, 680, 26);
 
             // 底部金句
             const quoteObj = quotes[Math.floor(Math.random() * quotes.length)];
