@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>明哥听写王中网 · 极简无限刷题版</title>
+    <title>明哥听写王中网 · 悬浮词典版</title>
     <script src="https://unpkg.com/tesseract.js@v5.0.2/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -16,7 +16,7 @@
             --text-main: #171717;     /* 正文黑 */
             --text-muted: #737373;    /* 辅助灰 */
             --border-color: #e5e5e5;  /* 边框灰 */
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
         }
         [data-theme="dark"] {
             --primary: #f5f5f5;
@@ -26,14 +26,27 @@
             --text-main: #f5f5f5;
             --text-muted: #a3a3a3;
             --border-color: #333333;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
         /* 全局排版 */
         body { font-family: 'Inter', '-apple-system', 'Microsoft YaHei', sans-serif; background: var(--bg-color); color: var(--text-main); padding: 30px 20px; margin: 0; transition: all 0.3s ease; min-height: 100vh; line-height: 1.6;}
-        .container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; position: relative; }
-        .full-width { grid-column: 1 / -1; }
         
+        /* 💡 核心布局修改：左侧自适应，右侧固定 320px */
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 340px; gap: 24px; position: relative; align-items: start; }
+        
+        /* 左侧主内容区 */
+        .main-column { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+        
+        /* 右侧悬浮侧边栏 */
+        .sidebar { position: sticky; top: 24px; max-height: calc(100vh - 48px); overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+        
+        /* 侧边栏滚动条美化 */
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        .sidebar:hover::-webkit-scrollbar-thumb { background: var(--text-muted); }
+
         /* 扁平化卡片 */
         .card { background: var(--card-bg); border-radius: 12px; padding: 32px; box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: 0.3s ease; }
         .card:hover { border-color: var(--text-muted); }
@@ -94,8 +107,10 @@
         #checkInCanvas { max-width: 100%; border-radius: 12px; border: 1px solid var(--border-color); }
         .hidden { display: none; }
         
+        /* 响应式调整 */
         @media (max-width: 900px) { 
             .container { grid-template-columns: 1fr; padding-top: 40px; } 
+            .sidebar { position: static; max-height: none; }
             .guide-grid { grid-template-columns: 1fr; }
             .top-controls { top: -30px; left: 50%; transform: translateX(-50%); width: max-content; } 
         }
@@ -103,107 +118,111 @@
 </head>
 <body>
 
-    <div class="container">
+    <div style="max-width: 1200px; margin: 0 auto; position: relative;">
         <div class="top-controls">
             <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="切换亮/暗模式">🌙</button>
             <button class="icon-btn" onclick="toggleLanguage()" id="langBtn" title="Language">EN</button>
         </div>
-
-        <div class="full-width">
-            <h1 data-zh="明哥听写王中网" data-en="MingGe Dictation Web">明哥听写王中网</h1>
-            <div class="subtitle" data-zh="保持专注 · 每日精听" data-en="Stay Focused · Daily Dictation">保持专注 · 每日精听</div>
-        </div>
-
-        <div class="card full-width">
-            <h2 data-zh="使用指南" data-en="User Guide">使用指南</h2>
-            <div class="guide-grid">
-                <div class="guide-item">
-                    <h3 data-zh="📥 模块一：素材库" data-en="📥 1. Material">📥 模块一：素材库</h3>
-                    <p data-zh="点击听写区的【随机获取】将不断追加四六级难度的新段落。也支持在左侧手动粘贴文本追加。" data-en="Click 'Auto-Fetch' to constantly append CET-level paragraphs, or manually paste custom text.">点击听写区的【随机获取】将不断追加四六级难度的新段落。也支持在左侧手动粘贴文本追加。</p>
-                </div>
-                <div class="guide-item">
-                    <h3 data-zh="🔍 模块二：生词本" data-en="🔍 2. Dictionary">🔍 模块二：生词本</h3>
-                    <p data-zh="听写中遇到生词随时查。查询记录转化为标签，点击历史标签即可快速重新查阅复习。" data-en="Look up words anytime. History words become clickable tags for quick review.">听写中遇到生词随时查。查询记录转化为标签，点击历史标签即可快速重新查阅复习。</p>
-                </div>
-                <div class="guide-item">
-                    <h3 data-zh="✍️ 模块三：听写区" data-en="✍️ 3. Practice">✍️ 模块三：听写区</h3>
-                    <p data-zh="长文自动切分为10-15词。播放并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。" data-en="Listen and type. Press Enter to verify. Click the Translate button for Chinese meaning.">长文自动切分为10-15词。播放并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。</p>
-                </div>
-                <div class="guide-item">
-                    <h3 data-zh="🏆 模块四：学习战报" data-en="🏆 4. Report">🏆 模块四：学习战报</h3>
-                    <p data-zh="结束刷题后，生成极简黑白灰排版专属海报，记录专注时长与刷题量，附送双语金句。" data-en="Generate a minimalist learning poster recording your focus time and a daily quote.">结束刷题后，生成极简黑白灰排版专属海报，记录专注时长与刷题量，附送双语金句。</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 data-zh="手动追加素材" data-en="Custom Material">手动追加素材</h2>
-            <div style="margin-bottom: 15px;">
-                <input type="file" id="imageInput" accept="image/*" class="hidden">
-                <button class="btn btn-outline" style="width: 100%;" id="btnOcr" onclick="document.getElementById('imageInput').click()" data-zh="从图片识别文字 (OCR)" data-en="Extract Text (OCR)">从图片识别文字 (OCR)</button>
-            </div>
-            <textarea id="sourceText" rows="6" placeholder="在此粘贴英文素材，点击下方按钮追加到听写区..."></textarea>
-            
-            <div style="margin: 20px 0;">
-                <label style="font-size: 0.9rem; font-weight: 600;"><span data-zh="语速" data-en="Speed">语速</span>: <span id="speedLabel">1.0</span>x</label>
-                <input type="range" id="speedRange" min="0.4" max="1.8" step="0.1" value="1.0" style="width:100%; margin-top: 10px;" oninput="document.getElementById('speedLabel').innerText=this.value">
-            </div>
-            <button class="btn btn-outline" style="width:100%;" onclick="appendCustomText()" id="btnSplit" data-zh="追加当前素材到听写区" data-en="Append to Practice Zone">追加当前素材到听写区</button>
-        </div>
-
-        <div class="card">
-            <h2 data-zh="生词本" data-en="Dictionary">生词本</h2>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="wordInput" placeholder="输入单词..." onkeypress="if(event.key === 'Enter') lookupWord()">
-                <button class="btn" id="btnLookup" onclick="lookupWord()" data-zh="查词" data-en="Search">查词</button>
-            </div>
-            <div id="dictResult" style="margin-top: 15px; min-height: 50px; font-weight: 600; background: var(--bg-color); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">...</div>
-            <div style="margin-top: 24px;">
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;" data-zh="查询历史:" data-en="History:">查询历史:</p>
-                <div id="vocabList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <h2 style="margin:0; border:none;" data-zh="听写刷题区" data-en="Practice Zone">听写刷题区</h2>
-                    <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="clearPracticeZone()" data-zh="清空面板" data-en="Clear All">清空面板</button>
-                </div>
-                <div id="liveStats" style="display: flex; align-items: center;">
-                    <span class="stat-badge"><span data-zh="完成度" data-en="Progress">完成度</span>: <span id="countSent">0</span>/<span id="totalSent">0</span></span>
-                    <span class="stat-badge"><span data-zh="计时" data-en="Time">计时</span>: <span id="studyTime">00:00</span></span>
-                </div>
-            </div>
-            
-            <button class="btn" id="btnFetchAndStart" onclick="fetchAndAppendPractice()" style="width: 100%; padding: 16px; margin-bottom: 24px; font-size: 1.05rem;" data-zh="随机获取段落并追加题目" data-en="Fetch Paragraph & Append">随机获取段落并追加题目</button>
-
-            <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-
-            <div id="practiceArea">
-                <div id="practiceEmptyMsg" style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border-color); border-radius: 8px;">
-                    <p data-zh="点击上方按钮，或在左侧导入素材开始..." data-en="Click button above or import text to start...">点击上方按钮，或在左侧导入素材开始...</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="card full-width">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <h2 style="margin:0; border:none;" data-zh="数据总结" data-en="Summary">数据总结</h2>
-                <button class="btn btn-outline" id="btnCheckIn" onclick="createCheckInCard()" data-zh="生成战报卡片" data-en="Generate Card">生成战报卡片</button>
-            </div>
-            <div id="canvasContainer">
-                <p style="color: var(--text-main); font-size: 0.9rem; margin-bottom: 15px;" id="reportSuccessMsg" data-zh="图像已生成，右键另存为即可。" data-en="Image generated. Right-click to save.">图像已生成，右键另存为即可。</p>
-                <canvas id="checkInCanvas" width="800" height="500"></canvas>
-            </div>
-        </div>
     </div>
 
-    <script>
+    <div>
+        <h1 data-zh="明哥听写王中网" data-en="MingGe Dictation King Web">明哥听写王中网</h1>
+        <div class="subtitle" data-zh="保持专注 · 每日精听" data-en="Stay Focused · Daily Dictation">保持专注 · 每日精听</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="main-column">
+            
+            <div class="card">
+                <h2 data-zh="使用指南" data-en="User Guide">使用指南</h2>
+                <div class="guide-grid">
+                    <div class="guide-item">
+                        <h3 data-zh="📥 模块一：素材库" data-en="📥 1. Material">📥 模块一：素材库</h3>
+                        <p data-zh="点击听写区的【随机获取】将不断追加新段落。也支持手动粘贴文本追加。" data-en="Click 'Auto-Fetch' to constantly append paragraphs, or manually paste custom text.">点击听写区的【随机获取】将不断追加新段落。也支持手动粘贴文本追加。</p>
+                    </div>
+                    <div class="guide-item">
+                        <h3 data-zh="🔍 模块二：悬浮词典" data-en="🔍 2. Dictionary">🔍 模块二：悬浮词典</h3>
+                        <p data-zh="右侧悬浮生词本，听写中随时查词无需滚动页面。点击历史标签可快速重新查阅。" data-en="Floating dictionary on the right. Look up words anytime without scrolling.">右侧悬浮生词本，听写中随时查词无需滚动页面。点击历史标签可快速重新查阅。</p>
+                    </div>
+                    <div class="guide-item">
+                        <h3 data-zh="✍️ 模块三：听写区" data-en="✍️ 3. Practice">✍️ 模块三：听写区</h3>
+                        <p data-zh="播放录音并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。" data-en="Listen and type. Press Enter to verify. Click the Translate button for meaning.">播放录音并输入，按 Enter 键极速校验。不懂的句子点击【文】一键翻译。</p>
+                    </div>
+                    <div class="guide-item">
+                        <h3 data-zh="🏆 模块四：学习战报" data-en="🏆 4. Report">🏆 模块四：学习战报</h3>
+                        <p data-zh="结束刷题后，生成极简排版专属海报，记录专注时长与刷题量，附送双语金句。" data-en="Generate a minimalist learning poster recording your focus time and a daily quote.">结束刷题后，生成极简排版专属海报，记录专注时长与刷题量，附送双语金句。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 data-zh="手动追加素材" data-en="Custom Material">手动追加素材</h2>
+                <div style="margin-bottom: 15px;">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                    <button class="btn btn-outline" style="width: 100%;" id="btnOcr" onclick="document.getElementById('imageInput').click()" data-zh="从图片识别文字 (OCR)" data-en="Extract Text (OCR)">从图片识别文字 (OCR)</button>
+                </div>
+                <textarea id="sourceText" rows="5" placeholder="在此粘贴英文素材，点击下方按钮追加到听写区..."></textarea>
+                
+                <div style="margin: 20px 0;">
+                    <label style="font-size: 0.9rem; font-weight: 600;"><span data-zh="语速" data-en="Speed">语速</span>: <span id="speedLabel">1.0</span>x</label>
+                    <input type="range" id="speedRange" min="0.4" max="1.8" step="0.1" value="1.0" style="width:100%; margin-top: 10px;" oninput="document.getElementById('speedLabel').innerText=this.value">
+                </div>
+                <button class="btn btn-outline" style="width:100%;" onclick="appendCustomText()" id="btnSplit" data-zh="追加当前素材到听写区" data-en="Append to Practice Zone">追加当前素材到听写区</button>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <h2 style="margin:0; border:none;" data-zh="听写刷题区" data-en="Practice Zone">听写刷题区</h2>
+                        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.8rem;" onclick="clearPracticeZone()" data-zh="清空面板" data-en="Clear All">清空面板</button>
+                    </div>
+                    <div id="liveStats" style="display: flex; align-items: center;">
+                        <span class="stat-badge"><span data-zh="完成度" data-en="Progress">完成度</span>: <span id="countSent">0</span>/<span id="totalSent">0</span></span>
+                        <span class="stat-badge"><span data-zh="计时" data-en="Time">计时</span>: <span id="studyTime">00:00</span></span>
+                    </div>
+                </div>
+                
+                <button class="btn" id="btnFetchAndStart" onclick="fetchAndAppendPractice()" style="width: 100%; padding: 16px; margin-bottom: 24px; font-size: 1.05rem;" data-zh="随机获取段落并追加题目" data-en="Fetch Paragraph & Append">随机获取段落并追加题目</button>
+
+                <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
+
+                <div id="practiceArea">
+                    <div id="practiceEmptyMsg" style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border-color); border-radius: 8px;">
+                        <p data-zh="点击上方按钮，或在上方导入素材开始..." data-en="Click button above or import text to start...">点击上方按钮，或在上方导入素材开始...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                    <h2 style="margin:0; border:none;" data-zh="数据总结" data-en="Summary">数据总结</h2>
+                    <button class="btn btn-outline" id="btnCheckIn" onclick="createCheckInCard()" data-zh="生成战报卡片" data-en="Generate Card">生成战报卡片</button>
+                </div>
+                <div id="canvasContainer">
+                    <p style="color: var(--text-main); font-size: 0.9rem; margin-bottom: 15px;" id="reportSuccessMsg" data-zh="图像已生成，右键另存为即可。" data-en="Image generated. Right-click to save.">图像已生成，右键另存为即可。</p>
+                    <canvas id="checkInCanvas" width="800" height="500"></canvas>
+                </div>
+            </div>
+
+        </div> <div class="sidebar">
+            <div class="card" style="padding: 24px;">
+                <h2 data-zh="悬浮生词本" data-en="Dictionary" style="font-size: 1.1rem;">悬浮生词本</h2>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="text" id="wordInput" placeholder="输入单词..." onkeypress="if(event.key === 'Enter') lookupWord()">
+                    <button class="btn" id="btnLookup" onclick="lookupWord()" data-zh="查词" data-en="Search" style="width: 100%;">查词</button>
+                </div>
+                <div id="dictResult" style="margin-top: 15px; min-height: 60px; font-weight: 600; background: var(--bg-color); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.95rem;">...</div>
+                <div style="margin-top: 24px;">
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;" data-zh="查询历史:" data-en="History:">查询历史:</p>
+                    <div id="vocabList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+            </div>
+        </div> </div> <script>
         let currentLang = 'zh';
         let currentTheme = 'light';
-        let chunks = [];          // 题库数组
-        let originalTexts = [];   // 用于战报显示的原文拼接
+        let chunks = [];          
+        let originalTexts = [];   
         let vocabCount = 0;
         let sentencesDone = new Set();
         let startTime = new Date();
@@ -211,7 +230,6 @@
         const speech = window.speechSynthesis;
         const learnedWords = [];
 
-        // 高质量长篇语料库 (四六级/考研难度级别)
         const offlineLibrary = [
             "The shift towards a digital economy has fundamentally changed how we work and live. Remote work is no longer merely a perk but a standard requirement for many professionals. Companies must adapt to this new paradigm to remain competitive.",
             "Environmental protection is one of the most pressing issues of our time. Reducing carbon footprints, minimizing plastic waste, and transitioning to renewable energy sources are critical steps to ensure a sustainable future for the next generation.",
@@ -220,7 +238,6 @@
             "The concept of lifelong learning has become essential in today's fast-paced society. As technology evolves at a breakneck speed, updating our skills constantly is the only way to avoid becoming obsolete in the job market."
         ];
 
-        // 励志金句
         const quotes = [
             { zh: "流水不争先，争的是滔滔不绝。", en: "Consistency is what transforms average into excellence." },
             { zh: "合抱之木，生于毫末；九层之台，起于累土。", en: "A journey of a thousand miles begins with a single step." },
@@ -284,11 +301,9 @@
 
             let newText = "";
             try { 
-                // 尝试获取大段落文本
                 const res = await axios.get('https://dummyjson.com/posts/random');
                 newText = res.data.body; 
             } catch (e) { 
-                // 如果API失败，使用本地四六级图库
                 newText = offlineLibrary[Math.floor(Math.random() * offlineLibrary.length)]; 
             } finally { 
                 btn.innerHTML = originalText;
@@ -297,16 +312,14 @@
             }
         }
 
-        // 手动处理文本域追加
         function appendCustomText() {
             const text = document.getElementById('sourceText').value.trim();
             if(text) {
                 processAndAppendText(text);
-                document.getElementById('sourceText').value = ""; // 提取后清空输入框
+                document.getElementById('sourceText').value = ""; 
             }
         }
 
-        // --- 核心追加逻辑 ---
         function processAndAppendText(rawText) {
             startTimer();
             originalTexts.push(rawText);
@@ -332,7 +345,6 @@
                 }
             });
 
-            // 清理碎片
             for(let i=newChunks.length-1; i>0; i--) {
                 if (newChunks[i].split(' ').length < 6 && (newChunks[i-1].split(' ').length + newChunks[i].split(' ').length) <= 20) {
                     newChunks[i-1] += ' ' + newChunks[i]; newChunks.splice(i, 1);
@@ -341,13 +353,12 @@
 
             if(newChunks.length === 0) return;
 
-            // 隐藏空状态提示
             const emptyMsg = document.getElementById('practiceEmptyMsg');
             if(emptyMsg) emptyMsg.style.display = 'none';
 
             const area = document.getElementById('practiceArea');
             const startIndex = chunks.length;
-            chunks = chunks.concat(newChunks); // 追加到全局题库
+            chunks = chunks.concat(newChunks); 
 
             const labels = {
                 chunk: currentLang === 'zh' ? '句子' : 'Sentence', words: currentLang === 'zh' ? '词' : 'words',
@@ -356,7 +367,6 @@
                 ph: currentLang === 'zh' ? '听写 (回车校验)...' : 'Type (Press Enter)...'
             };
 
-            // 仅渲染新增的题目
             newChunks.forEach((chunk, i) => {
                 const globalIndex = startIndex + i;
                 const item = document.createElement('div'); 
@@ -371,7 +381,6 @@
                         </div>
                     </div>
                     <div id="trans_box_${globalIndex}" class="translation-box hidden"></div>
-
                     <input type="text" id="input_${globalIndex}" class="practice-input" placeholder="${labels.ph}" onkeypress="if(event.key === 'Enter') verify(${globalIndex})">
                     <button class="btn btn-outline" style="width:100%; margin-top:8px; border-style:dashed;" onclick="verify(${globalIndex})">${labels.verify}</button>
                     <div id="feedback_${globalIndex}" class="feedback hidden"></div>
@@ -380,18 +389,15 @@
             });
             
             updateProgress();
-            
-            // 自动播放追加进来的第一句
             setTimeout(() => playSound(startIndex), 500);
         }
 
-        // --- 句子翻译功能 ---
         async function translateSentence(index) {
             const transBox = document.getElementById(`trans_box_${index}`);
             const textToTranslate = chunks[index];
 
             if (!transBox.classList.contains('hidden') && transBox.innerText !== "..." && transBox.innerText !== "Translating...") {
-                transBox.classList.add('hidden'); // 再次点击折叠
+                transBox.classList.add('hidden'); 
                 return;
             }
 
@@ -463,7 +469,7 @@
             }
         }
 
-        // --- 极简黑白灰战报生成 ---
+        // --- 战报生成 ---
         function createCheckInCard() {
             const canvas = document.getElementById('checkInCanvas'); const ctx = canvas.getContext('2d');
             document.getElementById('canvasContainer').style.display = 'block';
@@ -478,18 +484,15 @@
 
             const isZh = currentLang === 'zh';
 
-            // 标题
             ctx.fillStyle = fgColor; ctx.font = "900 32px 'Inter', sans-serif";
             ctx.fillText(isZh ? "明哥听写王中网" : "MingGe Dictation", 60, 80);
             
             ctx.font = "400 16px 'Inter', sans-serif"; ctx.fillStyle = mutedColor;
             ctx.fillText(new Date().toLocaleDateString(isZh?'zh-CN':'en-US') + (isZh ? "  |  学习战报" : "  |  Study Report"), 60, 110);
 
-            // 分割线
             ctx.strokeStyle = borderColor; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(60, 140); ctx.lineTo(740, 140); ctx.stroke();
 
-            // 数据区
             ctx.fillStyle = fgColor; ctx.font = "700 48px 'Inter', sans-serif";
             ctx.fillText(sentencesDone.size, 60, 220);
             ctx.fillText(vocabCount, 260, 220);
@@ -502,13 +505,11 @@
 
             ctx.beginPath(); ctx.moveTo(60, 300); ctx.lineTo(740, 300); ctx.stroke();
 
-            // 文本预览 (拼接前120字符)
             const combinedText = originalTexts.join(' ');
             const previewText = combinedText ? combinedText.substring(0, 120) : "No practice data yet.";
             ctx.fillStyle = fgColor; ctx.font = "400 16px 'Inter', sans-serif";
             wrapText(ctx, `"${previewText}..."`, 60, 350, 680, 26);
 
-            // 底部金句
             const quoteObj = quotes[Math.floor(Math.random() * quotes.length)];
             ctx.fillStyle = mutedColor; ctx.font = "italic 400 14px Georgia, serif";
             ctx.fillText(isZh ? quoteObj.zh : quoteObj.en, 60, 450);
